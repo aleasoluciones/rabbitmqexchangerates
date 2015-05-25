@@ -20,7 +20,9 @@ func countRoutingKeys(routingKeys chan string) {
 		case <-ticker.C:
 			for routingKey, eventsPerMinute := range routingKeysCounter {
 				log.Println(fmt.Sprintf("#/min %-4d %s", eventsPerMinute, routingKey))
+				routingKeysCounter[routingKey] = 0
 			}
+			log.Println()
 		}
 	}
 }
