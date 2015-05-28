@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"sort"
 	"time"
 
 	"github.com/aleasoluciones/simpleamqp"
@@ -18,9 +19,13 @@ func countRoutingKeys(routingKeys chan string) {
 		case routingKey := <-routingKeys:
 			routingKeysCounter[routingKey]++
 		case <-ticker.C:
-			for routingKey, eventsPerMinute := range routingKeysCounter {
-				log.Println(fmt.Sprintf("#/min %-4d %s", eventsPerMinute, routingKey))
-				routingKeysCounter[routingKey] = 0
+			keys := make([]string, 0, len(routingKeysCounter))
+			for routingKey := range routingKeysCounter {
+				keys = append(keys, routingKey)
+			}
+			sort.Strings(keys)
+			for _, key := range keys {
+				log.Println(fmt.Sprintf("#/min %-4d %s", routingKeysCounter[key], key))
 			}
 			log.Println()
 		}
